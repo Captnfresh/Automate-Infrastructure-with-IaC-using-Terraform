@@ -167,6 +167,125 @@ Another concept you must know is data type. This is a general programing concept
 * Try to write reusable code, avoid hard coding values wherever possible. (For learning purpose, we will start by hard coding, but gradually refactor our work to follow best practices).
 
 
+Great! 🎉 Now that we've verified programmatic access, we can move on to the next step.  
+
+---
+## Install Terraform (If You Haven't Already)
+Run this command to verify Terraform is installed:
+```bash
+terraform -version
+```
+If it’s not installed, download and install Terraform from the [official Terraform website](https://developer.hashicorp.com/terraform/downloads).
+
+### **🔹 Installing Terraform on Windows**
+Since you haven’t installed Terraform yet, follow these steps carefully.
+
+---
+
+### **Step 1: Download Terraform**
+1️⃣ Go to the [official Terraform website](https://developer.hashicorp.com/terraform/downloads).  
+2️⃣ Scroll down and select **Windows** as your OS.  
+3️⃣ Download the **.zip** file for the latest version.
+
+---
+
+### **Step 2: Extract & Move Terraform**
+1️⃣ Extract the **.zip** file to a location of your choice (e.g., `C:\terraform`).  
+2️⃣ Copy the `terraform.exe` file inside the extracted folder.  
+3️⃣ Move `terraform.exe` to a directory that’s in your **system PATH**, or add its location to PATH.
+
+---
+
+### **Step 3: Add Terraform to System PATH**
+1️⃣ Open **File Explorer**, right-click on **This PC**, and select **Properties**.  
+2️⃣ Click on **Advanced System Settings** → **Environment Variables**.  
+3️⃣ Under **System Variables**, find and select **Path**, then click **Edit**.  
+4️⃣ Click **New**, and paste the path where `terraform.exe` is located (e.g., `C:\terraform`).  
+5️⃣ Click **OK** to save changes.
+
+---
+
+### **Step 4: Verify Terraform Installation**
+1️⃣ Open **Command Prompt (cmd)** or **PowerShell**.  
+2️⃣ Run the following command:  
+   ```bash
+   terraform -version
+   ```
+3️⃣ You should see output similar to:  
+   ```
+   Terraform v1.xx.x
+   ```
+
+![image](https://github.com/user-attachments/assets/0a25a569-77a7-48c0-9751-e1805164a8bc)
+
+---
+
+
+## CREATING VPC | SUBNETS | SECURITY GROUPS
+
+### **Step 1: Create the Terraform Directory & File**  
+1️⃣ Open **VS Code**.  
+2️⃣ Create a new folder named **`PBL`** (inside `C:\Users\PC\` or any preferred location).  
+3️⃣ Inside the `PBL` folder, create a new file named **`main.tf`**.  
+
+Great! Now, let's move to the next step.  
+
+---
+
+### **Step 2: Define the Provider & VPC in `main.tf`**  
+1️⃣ Open `main.tf` in VS Code.  
+2️⃣ Copy and paste the following Terraform code into the file:  
+
+```
+# Define AWS Provider
+provider "aws" {
+  region = "eu-central-1"  # Change this to your preferred AWS region
+}
+
+# Create a VPC
+resource "aws_vpc" "main" {
+  cidr_block                     = "172.16.0.0/16"
+  enable_dns_support             = true
+  enable_dns_hostnames           = true
+  enable_classiclink             = false
+  enable_classiclink_dns_support = false
+}
+```
+
+3️⃣ **Save the file.**  
+
+![image](https://github.com/user-attachments/assets/8f919834-0f4f-4170-a634-14509b5a46d6)
+
+---
+
+### **Step 3: Initialize Terraform**  
+1️⃣ Open **Terminal** in VS Code (press `Ctrl + ~` to open it).  
+
+2️⃣ Navigate to your **PBL** folder (if you’re not already there):  
+```bash
+cd C:\Users\PC\PBL
+```
+
+3️⃣ Run the **terraform init** command to initialize the directory:  
+```bash
+terraform init
+```
+
+---
+
+### ✅ **Expected Output:**  
+You should see something like this:  
+```
+Initializing the backend...
+Initializing provider plugins...
+- Finding latest version of hashicorp/aws...
+- Installing hashicorp/aws vX.X.X...
+- Installed hashicorp/aws vX.X.X...
+Terraform has been successfully initialized!
+```
+![image](https://github.com/user-attachments/assets/efad9525-c74d-459b-a612-32abf0c00ea8)
+
+---
 
 
 
