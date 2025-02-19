@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/032b329e-91dd-4efa-9c36-949334526439)# Automate-Infrastructure-with-IaC-using-Terraform
+# Automate-Infrastructure-with-IaC-using-Terraform
 We have built AWS infrastructure for 2 websites manually, it is time to automate the process using Terraform.
 
 Let us start building the same set up with the power of Infrastructure as Code (IaC)
