@@ -48,12 +48,12 @@ Got it. Here’s **Step 3 from the beginning**, as if you haven't done anything 
 **3.1 Install AWS CLI on Windows**  
 Since we need AWS CLI to configure programmatic access, let's install it first.  
 
-1️⃣ Open **Git Bash** (or PowerShell)  
-2️⃣ Run this command to download and install AWS CLI:  
+1. Open **Git Bash** (or PowerShell)  
+2. Run this command to download and install AWS CLI:  
    ```bash
    msiexec.exe /i https://awscli.amazonaws.com/AWSCLIV2.msi
    ```
-3️⃣ Follow the installation prompts and complete the setup.  
+3. Follow the installation prompts and complete the setup.  
 
 ![image](https://github.com/user-attachments/assets/df238623-9bef-4a8a-891b-cc08038697ca)
 
@@ -78,11 +78,11 @@ aws-cli/2.x.x Python/x.x.x Windows/x.x.x exe/MSI
 ### **3.3 Configure AWS CLI with Access Keys**  
 Now, let's configure AWS CLI with your **IAM user’s access keys**.  
 
-1️⃣ Run the following command:  
+1. Run the following command:  
    ```bash
    aws configure
    ```  
-2️⃣ When prompted, enter:  
+2. When prompted, enter:  
    - **AWS Access Key ID:** _(Paste the access key you copied from IAM)_  
    - **AWS Secret Access Key:** _(Paste the secret key)_  
    - **Default region name:** _(e.g., `us-east-1`, `eu-west-1`, or your preferred region)_  
@@ -177,41 +177,41 @@ terraform -version
 ```
 If it’s not installed, download and install Terraform from the [official Terraform website](https://developer.hashicorp.com/terraform/downloads).
 
-### **🔹 Installing Terraform on Windows**
+**Installing Terraform on Windows**
 Since you haven’t installed Terraform yet, follow these steps carefully.
 
 ---
 
 ### **Step 1: Download Terraform**
-1️⃣ Go to the [official Terraform website](https://developer.hashicorp.com/terraform/downloads).  
-2️⃣ Scroll down and select **Windows** as your OS.  
-3️⃣ Download the **.zip** file for the latest version.
+1. Go to the [official Terraform website](https://developer.hashicorp.com/terraform/downloads).  
+2. Scroll down and select **Windows** as your OS.  
+3. Download the **.zip** file for the latest version.
 
 ---
 
 ### **Step 2: Extract & Move Terraform**
-1️⃣ Extract the **.zip** file to a location of your choice (e.g., `C:\terraform`).  
-2️⃣ Copy the `terraform.exe` file inside the extracted folder.  
-3️⃣ Move `terraform.exe` to a directory that’s in your **system PATH**, or add its location to PATH.
+1. Extract the **.zip** file to a location of your choice (e.g., `C:\terraform`).  
+2. Copy the `terraform.exe` file inside the extracted folder.  
+3. Move `terraform.exe` to a directory that’s in your **system PATH**, or add its location to PATH.
 
 ---
 
 ### **Step 3: Add Terraform to System PATH**
-1️⃣ Open **File Explorer**, right-click on **This PC**, and select **Properties**.  
-2️⃣ Click on **Advanced System Settings** → **Environment Variables**.  
-3️⃣ Under **System Variables**, find and select **Path**, then click **Edit**.  
-4️⃣ Click **New**, and paste the path where `terraform.exe` is located (e.g., `C:\terraform`).  
-5️⃣ Click **OK** to save changes.
+1. Open **File Explorer**, right-click on **This PC**, and select **Properties**.  
+2. Click on **Advanced System Settings** → **Environment Variables**.  
+3. Under **System Variables**, find and select **Path**, then click **Edit**.  
+4. Click **New**, and paste the path where `terraform.exe` is located (e.g., `C:\terraform`).  
+5. Click **OK** to save changes.
 
 ---
 
 ### **Step 4: Verify Terraform Installation**
-1️⃣ Open **Command Prompt (cmd)** or **PowerShell**.  
-2️⃣ Run the following command:  
-   ```bash
+1. Open **Command Prompt (cmd)** or **PowerShell**.  
+2. Run the following command:  
+   ```
    terraform -version
    ```
-3️⃣ You should see output similar to:  
+3. You should see output similar to:  
    ```
    Terraform v1.xx.x
    ```
@@ -224,17 +224,17 @@ Since you haven’t installed Terraform yet, follow these steps carefully.
 ## CREATING VPC | SUBNETS | SECURITY GROUPS
 
 ### **Step 1: Create the Terraform Directory & File**  
-1️⃣ Open **VS Code**.  
-2️⃣ Create a new folder named **`PBL`** (inside `C:\Users\PC\` or any preferred location).  
-3️⃣ Inside the `PBL` folder, create a new file named **`main.tf`**.  
+1. Open **VS Code**.  
+2. Create a new folder named **`PBL`** (inside `C:\Users\PC\` or any preferred location).  
+3. Inside the `PBL` folder, create a new file named **`main.tf`**.  
 
 Great! Now, let's move to the next step.  
 
 ---
 
 ### **Step 2: Define the Provider & VPC in `main.tf`**  
-1️⃣ Open `main.tf` in VS Code.  
-2️⃣ Copy and paste the following Terraform code into the file:  
+1. Open `main.tf` in VS Code.  
+2. Copy and paste the following Terraform code into the file:  
 
 ```
 # Define AWS Provider
@@ -252,28 +252,27 @@ resource "aws_vpc" "main" {
 }
 ```
 
-3️⃣ **Save the file.**  
+3. **Save the file.**  
 
 ![image](https://github.com/user-attachments/assets/8f919834-0f4f-4170-a634-14509b5a46d6)
 
 ---
 
 ### **Step 3: Initialize Terraform**  
-1️⃣ Open **Terminal** in VS Code (press `Ctrl + ~` to open it).  
+1. Open **Terminal** in VS Code (press `Ctrl + ~` to open it).  
 
-2️⃣ Navigate to your **PBL** folder (if you’re not already there):  
+2. Navigate to your **PBL** folder (if you’re not already there):  
 ```bash
 cd C:\Users\PC\PBL
 ```
 
-3️⃣ Run the **terraform init** command to initialize the directory:  
+3. Run the **terraform init** command to initialize the directory:  
 ```bash
 terraform init
 ```
 
 ---
 
-### ✅ **Expected Output:**  
 You should see something like this:  
 ```
 Initializing the backend...
@@ -345,6 +344,8 @@ Then, you can double-check in the AWS console:
 - Go to **VPC Dashboard**  
 - Click on **Your VPCs**  
 - Look for a VPC with the CIDR block `172.16.0.0/16`  
+
+![image](https://github.com/user-attachments/assets/a127ab4c-4b58-4670-81bf-e9279aacd8c3)
 
 
 
