@@ -333,8 +333,18 @@ Terraform will show you a summary of what it will create and ask for confirmatio
 ![image](https://github.com/user-attachments/assets/48d7e9d1-72e3-4614-a767-805e4de4c5c7)
 
 
+Your VPC is now up and running. Let’s quickly verify:  
 
+Run:  
+```
+terraform state list
+```
+This will show all the resources Terraform is managing. You should see your `aws_vpc.main` in the list.  
 
+Then, you can double-check in the AWS console:  
+- Go to **VPC Dashboard**  
+- Click on **Your VPCs**  
+- Look for a VPC with the CIDR block `172.16.0.0/16`  
 
 
 
