@@ -247,8 +247,6 @@ resource "aws_vpc" "main" {
   cidr_block                     = "172.16.0.0/16"
   enable_dns_support             = true
   enable_dns_hostnames           = true
-  enable_classiclink             = false
-  enable_classiclink_dns_support = false
 }
 ```
 
@@ -348,17 +346,49 @@ Then, you can double-check in the AWS console:
 ![image](https://github.com/user-attachments/assets/a127ab4c-4b58-4670-81bf-e9279aacd8c3)
 
 
+## Subnets resource section
+According to our architectural design, we require 6 subnets:
 
+* 2 public
+* 2 private for webservers
+* 2 private for data layer
 
+* Let us create the first 2 public subnets by adding the following to the main.tf file: 
 
+```
+# Create public subnet1
+resource "aws_subnet" "public1" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "172.16.0.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "us-east-1a"
+}
 
+# Create public subnet2
+resource "aws_subnet" "public2" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "172.16.1.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "us-east-1b"
+}
+```
+- Run `terraform plan` to preview the changes.
+- Run `terraform apply` to create the public subnets.
 
+![image](https://github.com/user-attachments/assets/d8e5b6f3-a493-4471-bd46-7f2cebc9f496)
 
+![image](https://github.com/user-attachments/assets/cffbf1a1-0384-4777-a02f-b4fd4ec0e105)
 
+***Now we confirm this on the Console to see if it was created successfully***
 
+![image](https://github.com/user-attachments/assets/aa8d14fe-caab-4d11-82b9-a3aaad012fa2)
+>We have successfully created two public subnets
 
+## **Observations:**
 
-
+* Hard coded values: Remember our best practice hint from the beginning? Both the availability_zone and cidr_block arguments are hard coded. We should always endeavour to make our work dynamic.
+* Multiple Resource Blocks: Notice that we have declared multiple resource blocks for each subnet in the code. This is bad coding practice. We need to create a single resource block that can dynamically create resources without specifying multiple blocks. Imagine if we wanted to create 10 subnets, our code would look very clumsy. So, we need to optimize this by introducing a count argument.
+First, destroy the current infrastructure. Since we are still in development, this is totally fine. Otherwise, DO NOT DESTROY an infrastructure that has been deployed to production.
 
 
 
