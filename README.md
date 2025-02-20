@@ -283,9 +283,71 @@ Initializing provider plugins...
 - Installed hashicorp/aws vX.X.X...
 Terraform has been successfully initialized!
 ```
-![image](https://github.com/user-attachments/assets/efad9525-c74d-459b-a612-32abf0c00ea8)
+![image](https://github.com/user-attachments/assets/25d78519-c330-4140-8ada-edf8b32559a5)
 
 ---
+
+### **Step 4: Run Terraform Plan**  
+This command will analyze the `main.tf` file and show you what Terraform is about to create.
+
+1. Run the following command in your **PBL** directory:  
+```bash
+terraform plan
+```
+
+2. Terraform will display a list of resources that will be created. It should include something like:
+```
+Terraform will perform the following actions:
+  # aws_vpc.main will be created
+  + resource "aws_vpc" "main" {
+      + cidr_block = "172.16.0.0/16"
+      + enable_dns_support = true
+      + enable_dns_hostnames = true
+      ...
+    }
+Plan: 1 to add, 0 to change, 0 to destroy.
+```
+This means Terraform has **recognized** your VPC configuration and is ready to deploy.
+
+![image](https://github.com/user-attachments/assets/5b87aa72-f25a-4716-b781-d912626ab6d5)
+
+![image](https://github.com/user-attachments/assets/ad0fd0b5-f80e-4463-84fc-481d9a647297)
+
+
+---
+
+Now that `terraform plan` is working fine, it's time to **apply** the changes and create the VPC.  
+
+### **Next Step: Apply Terraform Configuration**
+Run:  
+```bash
+terraform apply
+```
+Terraform will show you a summary of what it will create and ask for confirmation. Type **`yes`** when prompted.
+
+---
+
+- Terraform will create the **VPC** as defined in `main.tf`.
+- A new file, `terraform.tfstate`, will be generated to track your infrastructure state.
+
+![image](https://github.com/user-attachments/assets/48d7e9d1-72e3-4614-a767-805e4de4c5c7)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
