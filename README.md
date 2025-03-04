@@ -384,122 +384,71 @@ resource "aws_subnet" "public2" {
 ![image](https://github.com/user-attachments/assets/aa8d14fe-caab-4d11-82b9-a3aaad012fa2)
 >We have successfully created two public subnets
 
-## **Observations:**
 
-* Hard coded values: Remember our best practice hint from the beginning? Both the availability_zone and cidr_block arguments are hard coded. We should always endeavour to make our work dynamic.
-* Multiple Resource Blocks: Notice that we have declared multiple resource blocks for each subnet in the code. This is bad coding practice. We need to create a single resource block that can dynamically create resources without specifying multiple blocks. Imagine if we wanted to create 10 subnets, our code would look very clumsy. So, we need to optimize this by introducing a count argument.
-First, destroy the current infrastructure. Since we are still in development, this is totally fine. Otherwise, DO NOT DESTROY an infrastructure that has been deployed to production.
+## Introducing variables.tf & terraform.tfvars
+
+Instead of havng a long lisf of variables in main.tf file, we can actually make our code a lot more readable and better structured by moving out some parts of the configuration content to other files.
+
+* We will put all variable declarations in a separate file
+* And provide non default values to each of them
+
+1. Create a new file and name it `variables.tf`
+2. Copy all the variable declarations into the new file.
+3. Create another file, name it `terraform.tfvars`
+4. Set values for each of the variables.
 
 
-## VPC and Networking Configuration
+Alright, let's go step by step. We'll make sure everything is done properly before moving forward.  
 
-### Provider Configuration
-**1. Set up AWS Provider and Create VPC:**
+### **Step 1: Update `main.tf`**  
+This file will store all our variable declarations to make our configuration cleaner.  
+
+#### **Actions:**  
+1. Navigate to your Terraform project directory (e.g., `PBL`).  
+2. Create a new file named **`main.tf`**.  
+3. Copy the following variable declarations into `main.tf`:  
 
 ```
 provider "aws" {
-  region = eu-west-2
+  region = var.region  
 }
 
-# Create VPC
+# Create a VPC
 resource "aws_vpc" "main" {
-   cidr_block                       = "172.16.0.0/16"
-   enable_dns_support               = "true"
-   enable_dns_hostnames             = "true"
-   enable_classic_link              = "false" # Do not include this, as Terraform-Aws no longer support these attributes.
-   enable_classic_link_dns_support  = "false" # Do not include this, as Terraform-Aws no longer 
-   tags = {
-      Name = "main"
-   }
+  cidr_block                     = var.vpc_cidr
+  enable_dns_support             = var.enable_dns_support
+  enable_dns_hostnames           = var.enable_dns_hostnames
 }
 
-```
-
-Now for us to create this VPC in our aws cloud, terraform would need to download some plugins to enable it communicate properly with aws in the creation of our specs above. To download this plugins, we run terraform init
-
-2. Initialize and Plan:
-
-```
-terraform init
-terraform plan
-```
-![image](https://github.com/user-attachments/assets/c982a3df-c73f-472e-81d5-accff3a7dbf0)
-
-![image](https://github.com/user-attachments/assets/5bebe044-203a-44cd-8fb2-2c728c551eb1)
-
-***Observations:***
-1. A new file - terraform.tfstate - was created and immediately destroyed (at least in my case). Housed in this file is how Terraform keeps itself up to date with the exact state of your infrastructure. It reads this file to know what resource(s) already exists, what should be added, or destroyed based on the entire terraform code that is being developed.
-
-2. Also, another file - terraform.tfstate.lock.info - got created during planning and apply operation. But this file got deleted immediately. This file is what Terraform uses to track, who is running its code against the infrastructure at any point in time. This is very important for teams working on the same Terraform repository at the same time. The lock prevents a user from executing Terraform configuration against the same infrastructure when another user is doing the same - it helps to avoid duplicates and conflicts.
-
-Its content is usually like this:
-
-```
-{
-"ID":"e5e5ad0e-9cc5-7af1-3547-77bb3ee0958b",
-"Operation":"OperationTypePlan","Info":"",
-"Who":"user@Machine","Version":"0.13.4",
-"Created":"2020-10-28T19:19:28.261312Z",
-"Path":"terraform.tfstate"
-}
-```
-
-### Subnet Configuration
-According to our architectural design, we require 6 subnets:
-
-1. 2 public
-2. 2 private for webservers
-3. 2 private for data layer
-Let us create the first 2 public subnets.
-
-Add below configuration to the main.tf file:
-```
-# Create public subnets1
-  resource "aws_subnet" "public1" {
-  vpc_id                     = aws_vpc.main.id
-  cidr_block                 = "172.16.0.0/24"
-  map_public_ip_on_launch    = true
-  availability_zone          = "eu-west-2a"
-
+# Create public subnet1
+resource "aws_subnet" "public1" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = var.public_subnet1_cidr
+  map_public_ip_on_launch = true
+  availability_zone       = var.availability_zone_1
 }
 
 # Create public subnet2
-  resource "aws_subnet" "public2" {
-  vpc_id                     = aws_vpc.main.id
-  cidr_block                 = "172.16.1.0/24"
-  map_public_ip_on_launch    = true
-  availability_zone          = "eu-west-2b"
+resource "aws_subnet" "public2" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = var.public_subnet2_cidr
+  map_public_ip_on_launch = true
+  availability_zone       = var.availability_zone_2
 }
-```
-1. We are creating 2 subnets and that is why we are declaring 2 resource blocks - one for each of the subnets.
-2. We are using the vpc_id argument to interpolate the value of the VPC id by setting it to aws_vpc.main.id. This way, Terraform knows what VPC to create the subnet within.
-
-
-Run terraform plan and terraform apply
-
-![image](https://github.com/user-attachments/assets/a8af54d7-90a9-49c1-bd9f-1a27adfad471)
-
-
-![image](https://github.com/user-attachments/assets/2454dd9a-9cda-479b-aaad-fe37668dfeaf)
-
-![image](https://github.com/user-attachments/assets/a0bdb741-b351-48fa-b0c2-d2b134afb385)
-
-### ***Now, we will run terraform destroy to remove all the resources we have created in our aws account through terraform so that we can redo it, this time around, in a more flexible, dynamic way.***
-
-![image](https://github.com/user-attachments/assets/709ca04b-6540-432a-99d1-1eb408a275d9)
-
-Create a file called variables.tf, in this file is where we will declare our variables to use in the main.tf file. We could declare these variables in the main.tf file, but for the sake of making our work orderly and easy to read, we are separating the files for their respective purpose.
 
 ```
-sudo touch variables.tf
-```
 
-1. Variable Definition:
+![image](https://github.com/user-attachments/assets/b444c996-8885-411e-9709-3c39fcf3b6f7)
+
+
+
+### **Step 2: Create `variables.tf`**  
+
+Then, open `variables.tf` in your editor and paste the following content:
 
 ```
-# variables.tf
 variable "region" {
-  default = "eu-central-1"
+  default = "us-east-1"
 }
 
 variable "vpc_cidr" {
@@ -507,143 +456,92 @@ variable "vpc_cidr" {
 }
 
 variable "enable_dns_support" {
-  default = "true"
+  default = true
 }
 
 variable "enable_dns_hostnames" {
-  default = "true"
+  default = true
 }
 
-variable "preferred_number_of_public_subnets" {
-  default = null
+variable "public_subnet1_cidr" {
+  default = "172.16.0.0/24"
 }
 
-variable "vpc_tags"{
- description = "Tags to be applied to the VPC"
- type        = map(string)
- default = {
-     Environment = "production"
-     Terraform   = "true"
-     Project     = "PBL"
- }
+variable "public_subnet2_cidr" {
+  default = "172.16.1.0/24"
 }
+
+variable "availability_zone_1" {
+  default = "us-east-1a"
+}
+
+variable "availability_zone_2" {
+  default = "us-east-1b"
+}
+
 ```
 
-**2. Explicit variable Definitions**
+![image](https://github.com/user-attachments/assets/aee2bd04-9ec7-4e18-b8fa-76bfb9db72a6)
 
-Create another file called terraform.tfvars.
+
+### **Step 3: Create `terraform.tfvars` 
+Since we have moved our variable declarations to `variables.tf`, we need to update `main.tf` to reference those variables properly.
+
+#### **Actions:**  
+1. Open `terraform.tfvars` in your editor and paste the following values:
 
 ```
-touch terraform.tfvars
-```
-This file sets actual values for the variables declared in variables.tf. It's used to:
-* Override specific default values
-* Set environment-specific configurations
-* Keep sensitive values separate from main code
-
-Find below and replicate the content of the terraform.tfvars file:
-```
-# terraform.tfvars
-region = "eu-central-1"
+region = "us-east-1"
 vpc_cidr = "172.16.0.0/16"
 enable_dns_support = true
 enable_dns_hostnames = true
-preferred_number_of_public_subnets = 2
-vpc_tags = {
-   Name = "Production-VPC"
-   Environment = "production"
-   Terraform = "true"
-   Project = "PBL"
-}
-```
-
-3. Main Configuration Updates: Once you have applied the values in the terraform.tfvars file, we will now proceed to the main.tf file. This file contains the primary infrastructure configuration. It:
-* References variables using the var. prefix
-* Defines resources and their relationships
-* Contains provider configurations
+public_subnet1_cidr = "172.16.0.0/24"
+public_subnet2_cidr = "172.16.1.0/24"
+availability_zone_1 = "us-east-1a"
+availability_zone_2 = "us-east-1b"
 
 ```
-# main.tf
-provider "aws" {
-  region = var.region
-}
 
-# Get list of availability zones
-data "aws_availability_zones" "available" {
-  state = "available"
-}
+![image](https://github.com/user-attachments/assets/b5168728-c4c0-4866-87e4-3d2d39ddcc5e)
 
-# Create VPC
-resource "aws_vpc" "main" {
-  cidr_block                     = var.vpc_cidr
-  enable_dns_support             = var.enable_dns_support
-  enable_dns_hostnames           = var.enable_dns_hostnames
-  tags = {
-      Name        = "Production-VPC"
-      Environment = "production"
-      Terraform   = "true"
-      Project     = "PBL"
-}
-}
 
-# Dynamically create public subnets
-resource "aws_subnet" "public" {
-  count                   = var.preferred_number_of_public_subnets == null ? length(data.aws_availability_zones.available.names) : var.preferred_number_of_public_subnets
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = cidrsubnet(var.vpc_cidr, 4, count.index)
-  map_public_ip_on_launch = true
-  availability_zone       = data.aws_availability_zones.available.names[count.index]
-}
+### Now, let's verify everything works with `terraform plan`.
+
+### **Step 5: Run `terraform plan`**  
+Before running the plan, make sure you're in the project directory (`PBL`) where your `main.tf`, `variables.tf`, and `terraform.tfvars` files are located.
+
+Run the following command:  
+
+```
+terraform init
 ```
 
-![image](https://github.com/user-attachments/assets/eb502723-4474-487c-a9a1-857cc385676a)
+This will initialize the Terraform project and download the necessary provider plugins.
 
-![image](https://github.com/user-attachments/assets/9b126482-140f-48c2-a21a-966871184cd4)
+Then, run the `terraform plan` command:  
 
-![image](https://github.com/user-attachments/assets/92bdb559-e57c-49ee-b093-690214b32a1f)
-
-
-At the end, our file structure should look somewhat like this:
-```
-PBL/
-├── main.tf           # Main configuration file
-├── variables.tf      # Variable declarations
-├── terraform.tfvars  # Variable values
+```sh
+terraform plan
 ```
 
-![image](https://github.com/user-attachments/assets/995f7633-91f9-4cbf-acc7-45c55f7d9d90)
+This will show you a preview of the actions Terraform will take based on your configuration. It should not make any changes yet but will display the resources that will be created, modified, or destroyed.
 
-![image](https://github.com/user-attachments/assets/19c1e48d-c252-4559-b80a-ee1060078617)
+![image](https://github.com/user-attachments/assets/2fedfce5-d3fc-422e-b777-a6f1bdc2f050)
 
-![image](https://github.com/user-attachments/assets/12fa5281-0590-469a-8b3b-5df49c84f43c)
-
-# Conclusion
-## Project Achievements
-Through this Infrastructure as Code (IaC) implementation with Terraform, we have successfully:
-* Automated the creation of a production-grade VPC infrastructure
-* Implemented dynamic subnet allocation across availability zones
-* Established a maintainable and scalable code structure
-* Applied AWS best practices for networking and security
-
-## Benefits Realized
-1. Automation
-* Reduced manual configuration errors
-* Consistent infrastructure deployment
-* Faster provisioning and teardown of resources
-
-2. Maintainability
-* Clear separation of configuration files
-* Well-documented variable definitions
-* Reusable code components
+***If `terraform plan` looks good and shows no errors, you’re all set!***
 
 
-***This project demonstrates the power of Infrastructure as Code using Terraform. By automating our infrastructure deployment, we have not only improved efficiency but also established a foundation for future scaling and maintenance. The practices and patterns established here can serve as a template for future infrastructure projects and continue to evolve with changing requirements and best practices.***
+# ***Conclusion***  
 
+This project demonstrated the importance of structuring Terraform configurations for better readability, maintainability, and scalability. By separating variable declarations into `variables.tf` and storing variable values in `terraform.tfvars`, we achieved a more modular and flexible approach to infrastructure as code (IaC).  
 
+Key takeaways from this project include:  
+1. **Improved Code Organization** – Moving variable definitions to separate files reduces clutter in `main.tf`, making it easier to read and manage.  
+2. **Enhanced Reusability** – By defining variables externally, the same configuration can be reused across different environments with minimal modifications.  
+3. **Simplified Configuration Management** – Using `terraform.tfvars` allows for quick updates without altering the core Terraform code.  
+4. **Scalability and Best Practices** – This structured approach aligns with Terraform best practices, making infrastructure deployment more efficient and scalable.  
 
-
-
-
+***By following this approach, we have created a well-structured Terraform setup that simplifies AWS infrastructure provisioning while ensuring flexibility for future changes.***
 
 
 
